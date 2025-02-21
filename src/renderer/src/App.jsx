@@ -28,6 +28,21 @@ function App() {
     }
   }
 
+  const fetchAllBooks = async () => {
+    setLoading(true)
+    try {
+      const response = await axios.get('http://countmein.pythonanywhere.com/api/v1/marc/records/')
+      console.log('Fetched all books:', response.data)
+      setFilteredResults(response.data)
+      setShowDropdown(true)
+    } catch (error) {
+      console.error('Error fetching all books:', error)
+      setFilteredResults([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const searchBooks = async (value) => {
     if (!value?.trim()) {
       console.log('Empty search value, clearing results')
@@ -69,11 +84,21 @@ function App() {
     }
   }
 
+  const handleInputClick = () => {
+    if (!showDropdown) {
+      fetchAllBooks()
+    }
+  }
+
   const handleSearch = (e) => {
     const value = e.target.value
     setSearchValue(value)
     setSelectedIndex(-1) // Reset selection on new search
-    searchBooks(value)
+    if (value.trim()) {
+      searchBooks(value)
+    } else {
+      fetchAllBooks() // Show all books when input is empty
+    }
   }
 
   const scrollToItem = (index) => {
@@ -125,6 +150,30 @@ function App() {
     navigate(`/book/${item.id}`)
   }
 
+  const handleInputFocus = () => {
+    if (!showDropdown) {
+      fetchAllBooks()
+    }
+  }
+
+  const handleClickOutside = (e) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(e.target) &&
+      !e.target.classList.contains('search-input')
+    ) {
+      setShowDropdown(false)
+    }
+  }
+
+  // Add event listener for clicking outside
+  React.useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
   return (
     <div className="container">
       <div className="search-wrapper">
@@ -134,6 +183,8 @@ function App() {
           value={searchValue}
           onChange={handleSearch}
           onKeyDown={handleKeyDown}
+          onFocus={handleInputFocus}
+          onClick={handleInputClick}
           className="search-input"
         />
         <FaSearch className="search-icon" />

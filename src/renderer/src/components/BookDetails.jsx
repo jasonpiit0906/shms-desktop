@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { FaArrowLeft } from 'react-icons/fa'
-import '../styles/BookDetails.css' // Add this import
+import '../styles/BookDetails.css'
+import defaultCover from '../assets/default-book-cover.svg'
 
 function BookDetails() {
   const [book, setBook] = useState(null)
@@ -51,17 +52,13 @@ function BookDetails() {
 
         <div className="book-details-content">
           <div className="book-cover">
-            {book?.isbn ? (
-              <img
-                src={getCoverUrl(book.isbn)}
-                alt={book.title}
-                onError={(e) => {
-                  e.target.src = '/default-book-cover.png'
-                }}
-              />
-            ) : (
-              <img src="/default-book-cover.png" alt="Default Cover" />
-            )}
+            <img
+              src={book?.isbn ? getCoverUrl(book.isbn) : defaultCover}
+              alt={book?.title || 'Default Cover'}
+              onError={(e) => {
+                e.target.src = defaultCover
+              }}
+            />
             <div className="status-badge">{book?.status}</div>
           </div>
 
