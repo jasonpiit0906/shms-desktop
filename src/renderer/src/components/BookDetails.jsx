@@ -8,11 +8,30 @@ import defaultCover from '../assets/default-book-cover.svg'
 function BookDetails() {
   const [book, setBook] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [bookSummary, setBookSummary] = useState('')
   const { id } = useParams()
   const navigate = useNavigate()
 
   const getCoverUrl = (isbn) => {
     return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`
+  }
+
+  const fetchBookSummary = async (isbn) => {
+    try {
+      const response = await axios.get(
+        `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`
+      )
+      const bookData = response.data[`ISBN:${isbn}`]
+      if (bookData && bookData.description) {
+        setBookSummary(
+          typeof bookData.description === 'object'
+            ? bookData.description.value
+            : bookData.description
+        )
+      }
+    } catch (error) {
+      console.error('Error fetching book summary:', error)
+    }
   }
 
   useEffect(() => {
@@ -22,6 +41,9 @@ function BookDetails() {
           `http://countmein.pythonanywhere.com/api/v1/marc/record/${id}/`
         )
         setBook(response.data)
+        if (response.data?.isbn) {
+          fetchBookSummary(response.data.isbn)
+        }
       } catch (error) {
         console.error('Error fetching book details:', error)
       } finally {
@@ -38,123 +60,51 @@ function BookDetails() {
 
   return (
     <div className="book-details-container">
-      {book?.isbn && (
-        <div
-          className="background-image"
-          style={{ backgroundImage: `url(${getCoverUrl(book.isbn)})` }}
-        />
-      )}
+      <button className="back-button" onClick={() => navigate('/')}>
+        <FaArrowLeft /> Back to Search
+      </button>
 
       <div className="content-overlay">
-        <button className="back-button" onClick={() => navigate('/')}>
-          <FaArrowLeft /> Back to Search
-        </button>
-
         <div className="book-details-content">
-          <div className="book-cover">
-            <img
-              src={book?.isbn ? getCoverUrl(book.isbn) : defaultCover}
-              alt={book?.title || 'Default Cover'}
-              onError={(e) => {
-                e.target.src = defaultCover
-              }}
-            />
-            <div className="status-badge">{book?.status}</div>
-          </div>
-
-          <div className="book-info">
-            <h1>{book?.title}</h1>
-            <h2>By {book?.author}</h2>
-
-            <div className="book-metadata">
-              <div className="metadata-section">
-                <h3>Publication Details</h3>
-                {book?.publisher && (
-                  <p>
-                    <strong>Publisher:</strong> {book.publisher}
-                  </p>
-                )}
-                {book?.place_of_publication && (
-                  <p>
-                    <strong>Place of Publication:</strong> {book.place_of_publication}
-                  </p>
-                )}
-                {book?.year && (
-                  <p>
-                    <strong>Year:</strong> {book.year}
-                  </p>
-                )}
-                {book?.edition && (
-                  <p>
-                    <strong>Edition:</strong> {book.edition}
-                  </p>
-                )}
-                {book?.volume && (
-                  <p>
-                    <strong>Volume:</strong> {book.volume}
-                  </p>
-                )}
-                {book?.physical_description && (
-                  <p>
-                    <strong>Physical Description:</strong> {book.physical_description}
-                  </p>
-                )}
-              </div>
-
-              <div className="metadata-section">
-                <h3>Identifiers</h3>
-                {book?.isbn && (
-                  <p>
-                    <strong>ISBN:</strong> {book.isbn}
-                  </p>
-                )}
-                {book?.accession_number && (
-                  <p>
-                    <strong>Accession Number:</strong> {book.accession_number}
-                  </p>
-                )}
-                {book?.barcode && (
-                  <p>
-                    <strong>Barcode:</strong> {book.barcode}
-                  </p>
-                )}
-              </div>
-
-              <div className="metadata-section">
-                <h3>Library Information</h3>
-                {book?.status && (
-                  <p>
-                    <strong>Status:</strong> {book.status}
-                  </p>
-                )}
-                {book?.date_received && (
-                  <p>
-                    <strong>Date Received:</strong>{' '}
-                    {new Date(book.date_received).toLocaleDateString()}
-                  </p>
-                )}
-                {book?.date_processed && (
-                  <p>
-                    <strong>Date Processed:</strong>{' '}
-                    {new Date(book.date_processed).toLocaleDateString()}
-                  </p>
-                )}
-                {book?.subject && (
-                  <p>
-                    <strong>Subject:</strong> {book.subject}
-                  </p>
-                )}
-              </div>
-
+          <div className="book-cover-section">
+            <div className="book-cover">
+              <img
+                src={book?.isbn ? getCoverUrl(book.isbn) : defaultCover}
+                alt={book?.title || 'Default Cover'}
+                onError={(e) => {
+                  e.target.src = defaultCover
+                }}
+              />
+              <div className="status-badge">{book?.status}</div>
+            </div>
+            <div className="book-metadata-compact">
               {book?.series_title && (
-                <div className="metadata-section">
-                  <h3>Series Information</h3>
-                  <p>
-                    <strong>Series Title:</strong> {book.series_title}
-                  </p>
-                </div>
+                <p>
+                  <strong>Series:</strong> {book.series_title}
+                </p>
+              )}
+              <p>
+                <strong>Publisher:</strong> {book?.publisher}
+              </p>
+              <p>
+                <strong>Published:</strong> {book?.place_of_publication}, {book?.year}
+              </p>
+              {book?.edition && (
+                <p>
+                  <strong>Edition:</strong> {book.edition}
+                </p>
+              )}
+              {book?.volume && (
+                <p>
+                  <strong>Volume:</strong> {book.volume}
+                </p>
               )}
             </div>
+          </div>
+
+          <div className="book-title-section">
+            <h1 className="book-main-title">{book?.title}</h1>
+            <h2 className="book-author">by {book?.author}</h2>
           </div>
         </div>
       </div>

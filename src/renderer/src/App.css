@@ -4,6 +4,7 @@ html {
   padding: 0;
   height: 100%;
   width: 100%;
+  background: #0a0b64;
 }
 
 .container {
@@ -142,4 +143,15 @@ html {
     max-width: 100%;
     margin: 0 15px;
   }
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0a0b64;
+}
+
+main {
+  flex: 1;
 }
