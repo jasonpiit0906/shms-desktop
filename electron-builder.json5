@@ -1,0 +1,21 @@
+{
+  // ...existing config...
+  electronDownload: {
+    customDir: 'custom/path/to/electron'
+  },
+  protocols: [
+    {
+      name: 'shms-desktop',
+      schemes: ['shms-desktop']
+    }
+  ],
+  extraResources: [
+    {
+      from: 'build',
+      to: 'app/build'
+    }
+  ],
+  security: {
+    csp: "default-src 'self'; connect-src 'self' http://countmein.pythonanywhere.com https://openlibrary.org; img-src 'self' https://covers.openlibrary.org data: blob: https:;"
+  }
+}

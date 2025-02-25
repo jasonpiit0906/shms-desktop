@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import '../App.css'
 import '../styles/SearchPage.css'
+import defaultCover from '../assets/default-book-cover.svg'
 
 function SearchPage() {
   const [searchValue, setSearchValue] = useState('')
@@ -173,21 +174,49 @@ function SearchPage() {
     }
   }, [])
 
+  const getCoverUrl = (isbn) => {
+    return `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`
+  }
+
+  const renderFloatingBooks = () => {
+    const books = []
+    for (let i = 0; i < 20; i++) {
+      const style = {
+        left: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 15}s`,
+        animationDuration: `${15 + Math.random() * 15}s`,
+        opacity: 0.1 + Math.random() * 0.1
+      }
+      books.push(<div key={i} className="floating-book" style={style} />)
+    }
+    return books
+  }
+
   return (
     <div className="search-page">
+      <div className="floating-books">{renderFloatingBooks()}</div>
       <div className="search-container">
-        <input
-          type="text"
-          placeholder="Search books..."
-          value={searchValue}
-          onChange={handleSearch}
-          onKeyDown={handleKeyDown}
-          onFocus={handleInputFocus}
-          onClick={handleInputClick}
-          className="search-input"
-        />
-        <FaSearch className="search-icon" />
-        {loading && <div className="loading-indicator">Searching...</div>}
+        <h1 className="search-title">Search Books</h1>
+        <p className="search-subtitle">Search through our collection of books</p>
+
+        <div className="search-wrapper">
+          <input
+            type="text"
+            placeholder="Search by title, author, or ISBN..."
+            value={searchValue}
+            onChange={handleSearch}
+            onKeyDown={handleKeyDown}
+            onFocus={handleInputFocus}
+            onClick={handleInputClick}
+            className="search-input"
+          />
+          {loading ? (
+            <div className="loading-indicator">Searching...</div>
+          ) : (
+            <FaSearch className={`search-icon ${loading ? 'hidden' : ''}`} />
+          )}
+        </div>
+
         {showDropdown && filteredResults.length > 0 && (
           <div className="search-dropdown" ref={dropdownRef}>
             {filteredResults.map((item, index) => (
@@ -196,10 +225,19 @@ function SearchPage() {
                 className={`dropdown-item ${index === selectedIndex ? 'selected' : ''}`}
                 onClick={() => handleItemClick(item)}
               >
-                <div className="book-title">{item.title}</div>
-                <div className="book-details">
-                  <span>Author: {item.author}</span>
-                  <span>ISBN: {item.isbn}</span>
+                <img
+                  src={item.isbn ? getCoverUrl(item.isbn) : defaultCover}
+                  alt={item.title}
+                  className="dropdown-item-cover"
+                  onError={(e) => {
+                    e.target.src = defaultCover
+                  }}
+                />
+                <div className="dropdown-item-info">
+                  <div className="book-title">{item.title}</div>
+                  <div className="book-details">
+                    <span>Author: {item.author}</span>
+                  </div>
                 </div>
               </div>
             ))}

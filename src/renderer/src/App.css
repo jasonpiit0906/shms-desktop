@@ -4,7 +4,7 @@ html {
   padding: 0;
   height: 100%;
   width: 100%;
-  background: #0a0b64;
+  background: #ffffff;
 }
 
 .container {
@@ -14,7 +14,7 @@ html {
   justify-content: center;
   align-items: center;
   position: relative;
-  background: url('./assets/background.png');
+  background: #ffffff;
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -149,7 +149,7 @@ html {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #0a0b64;
+  background: #ffffff;
 }
 
 main {

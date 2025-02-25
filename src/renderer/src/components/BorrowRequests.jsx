@@ -1,29 +1,34 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import Skeleton from './Skeleton'
 import '../styles/BorrowRequests.css'
 import defaultCover from '../assets/default-book-cover.svg'
 
 function BorrowRequests() {
-  const [books, setBooks] = useState([])
+  const [allBooks, setAllBooks] = useState([])
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
   const navigate = useNavigate()
 
   const getCoverUrl = (isbn) =>
     isbn ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg` : defaultCover
 
   useEffect(() => {
-    const fetchBooks = async () => {
+    const fetchAllBooks = async () => {
       setLoading(true)
       try {
-        const response = await axios.get(
-          `http://countmein.pythonanywhere.com/api/v1/marc/search/?page=${currentPage}`
+        // Get first page to get total count
+        const firstPage = await axios.get('http://countmein.pythonanywhere.com/api/v1/marc/search/')
+        const totalPages = Math.ceil(firstPage.data.count / 10)
+
+        // Fetch all pages concurrently
+        const pagePromises = Array.from({ length: totalPages }, (_, i) =>
+          axios.get(`http://countmein.pythonanywhere.com/api/v1/marc/search/?page=${i + 1}`)
         )
-        setBooks(response.data.results)
-        // Calculate total pages based on count (assuming 10 items per page)
-        setTotalPages(Math.ceil(response.data.count / 10))
+
+        const responses = await Promise.all(pagePromises)
+        const allBooks = responses.flatMap((response) => response.data.results)
+        setAllBooks(allBooks)
       } catch (error) {
         console.error('Error fetching books:', error)
       } finally {
@@ -31,84 +36,37 @@ function BorrowRequests() {
       }
     }
 
-    fetchBooks()
-  }, [currentPage])
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page)
-    window.scrollTo(0, 0)
-  }
+    fetchAllBooks()
+  }, [])
 
   const handleBookClick = (bookId) => {
     navigate(`/book/${bookId}`)
   }
 
-  const renderPagination = () => {
-    const pages = []
-    const maxVisiblePages = 5
-
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1)
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={`pagination-button ${currentPage === i ? 'active' : ''}`}
-        >
-          {i}
-        </button>
-      )
-    }
-
-    return (
-      <div className="pagination">
-        <button
-          className="pagination-button"
-          onClick={() => handlePageChange(1)}
-          disabled={currentPage === 1}
-        >
-          First
-        </button>
-        <button
-          className="pagination-button"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        {pages}
-        <button
-          className="pagination-button"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-        <button
-          className="pagination-button"
-          onClick={() => handlePageChange(totalPages)}
-          disabled={currentPage === totalPages}
-        >
-          Last
-        </button>
+  const renderSkeletonLoading = () => (
+    <div className="borrow-requests-container">
+      <h1>Loading Books Collection...</h1>
+      <div className="skeleton-grid">
+        {[...Array(24)].map((_, index) => (
+          <Skeleton key={index} type="card" />
+        ))}
       </div>
-    )
-  }
+    </div>
+  )
 
-  if (loading) return <div className="loading">Loading...</div>
+  if (loading) return renderSkeletonLoading()
 
   return (
     <div className="borrow-requests-container">
-      <h1>All Books Collection</h1>
+      <h1>All Books Collection ({allBooks.length} Books)</h1>
       <div className="requests-grid">
-        {books.map((book) => (
-          <div key={book.id} className="book-request-card" onClick={() => handleBookClick(book.id)}>
+        {allBooks.map((book, index) => (
+          <div
+            key={book.id}
+            className="book-request-card"
+            onClick={() => handleBookClick(book.id)}
+            style={{ '--i': index }} // Add custom property for delay calculation
+          >
             <img
               src={getCoverUrl(book.isbn)}
               alt={book.title}
@@ -118,13 +76,12 @@ function BorrowRequests() {
             <div className="book-info">
               <h3>{book.title}</h3>
               <p className="author">By {book.author}</p>
-              <p className="isbn">{book.isbn}</p>
+              <p className="isbn">ISBN: {book.isbn || 'N/A'}</p>
               <div className={`status ${book.status.toLowerCase()}`}>{book.status}</div>
             </div>
           </div>
         ))}
       </div>
-      {renderPagination()}
     </div>
   )
 }

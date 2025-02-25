@@ -1,18 +1,17 @@
 .navbar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 4rem;
-  background: linear-gradient(
-    135deg,
-    rgba(10, 11, 100, 0.95) 0%,
-    rgba(26, 27, 143, 0.95) 50%,
-    rgba(36, 38, 165, 0.95) 100%
-  );
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(43, 108, 176, 0.1);
 }
 
 .navbar-left {
@@ -21,14 +20,24 @@
 }
 
 .logo-link {
-  text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.logo-link h2 {
+  color: #2563eb; /* Primary blue color */
+  font-weight: 600;
+  margin: 0;
+  padding-left: 10px;
+  background: linear-gradient(45deg, #2563eb, #1d4ed8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-logo {
-  height: 45px;
+  height: 40px;
   width: auto;
   transition: transform 0.3s ease;
 }
@@ -39,16 +48,16 @@
 
 .navbar-right {
   display: flex;
-  gap: 2.5rem;
+  gap: 2rem;
   align-items: center;
 }
 
 .nav-link {
+  color: #2d3748;
   text-decoration: none;
-  color: #ffffff;
   font-weight: 500;
   font-size: 1rem;
-  padding: 0.6rem 1.2rem;
+  padding: 0.5rem 1rem;
   border-radius: 8px;
   transition: all 0.3s ease;
   position: relative;
@@ -59,37 +68,47 @@
   position: absolute;
   bottom: 0;
   left: 50%;
-  transform: translateX(-50%);
   width: 0;
   height: 2px;
-  background: #ffffff;
-  transition: width 0.3s ease;
+  background: #2b6cb0;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
 }
 
 .nav-link:hover::after {
-  width: 70%;
+  width: 80%;
 }
 
 .nav-link.active {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
+  color: #2b6cb0;
+}
+
+.nav-link.active::after {
+  width: 80%;
+}
+
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content-wrapper {
+  margin-top: 74px;
+  flex: 1;
+  background: #f8f9fa;
 }
 
 @media (max-width: 768px) {
   .navbar {
-    padding: 1rem 2rem;
-  }
-
-  .navbar-logo {
-    height: 35px;
+    padding: 1rem;
   }
 
   .navbar-right {
-    gap: 1.5rem;
+    gap: 1rem;
   }
 
   .nav-link {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem;
   }
 }

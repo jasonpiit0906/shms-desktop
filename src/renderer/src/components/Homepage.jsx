@@ -6,76 +6,71 @@ import '../styles/Homepage.css'
 import '../styles/Navbar.css'
 import defaultCover from '../assets/default-book-cover.svg'
 import logo from '../assets/logo.png' // Make sure to add your logo
+import Skeleton from './Skeleton'
 
 function Homepage() {
   const [featuredBook, setFeaturedBook] = useState(null)
   const [popularBooks, setPopularBooks] = useState([])
   const [loading, setLoading] = useState(true)
-  const [bookDescription, setBookDescription] = useState('')
+  const [loadingImages, setLoadingImages] = useState({})
   const navigate = useNavigate()
 
   const getCoverUrl = (isbn) =>
     isbn ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg` : defaultCover
 
-  const fetchBookDescription = async (isbn) => {
-    if (!isbn) return
-
-    try {
-      const response = await axios.get(
-        `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`
-      )
-      const bookData = response.data[`ISBN:${isbn}`]
-      if (bookData && bookData.description) {
-        const description =
-          typeof bookData.description === 'object'
-            ? bookData.description.value
-            : bookData.description
-        setBookDescription(description)
-      }
-    } catch (error) {
-      console.error('Error fetching book description:', error)
-      setBookDescription('No description available.')
-    }
-  }
-
   useEffect(() => {
-    const fetchBooks = async () => {
+    const fetchRecentBooks = async () => {
+      setLoading(true)
       try {
         const response = await axios.get('http://countmein.pythonanywhere.com/api/v1/marc/search/')
-        const { results } = response.data
+        const books = response.data.results.slice(0, 6).map((book) => ({
+          ...book,
+          cover: getCoverUrl(book.isbn)
+        }))
 
-        if (results.length > 0) {
-          const mainBook = results[0]
+        // Set the first book as featured
+        if (books.length > 0) {
           setFeaturedBook({
-            ...mainBook,
-            rating: 4.5,
-            coverImage: getCoverUrl(mainBook.isbn)
+            ...books[0],
+            coverImage: getCoverUrl(books[0].isbn),
+            rating: 4 // You can adjust this or make it dynamic
           })
-
-          // Fetch description for the featured book
-          if (mainBook.isbn) {
-            fetchBookDescription(mainBook.isbn)
-          }
-
-          // Change from 6 to 11 to get 10 books after the featured book
-          const nextTenBooks = results.slice(1, 11).map((book) => ({
-            id: book.id,
-            title: book.title,
-            author: book.author,
-            cover: getCoverUrl(book.isbn),
-            status: book.status
-          }))
-          setPopularBooks(nextTenBooks)
         }
+
+        setPopularBooks(books) // Fixed: Using setPopularBooks instead of setRecentBooks
       } catch (error) {
-        console.error('Error fetching books:', error)
+        console.error('Error fetching recent books:', error)
+        setPopularBooks([]) // Fixed: Using setPopularBooks instead of setRecentBooks
       } finally {
         setLoading(false)
       }
     }
 
-    fetchBooks()
+    fetchRecentBooks()
   }, [])
+
+  const generateDescription = (book) => {
+    if (!book) return ''
+    let description = `${book.title} is a book written by ${book.author}`
+
+    if (book.series_title) {
+      description += `, part of the ${book.series_title} series`
+    }
+
+    if (book.publisher) {
+      description += `. This ${book.edition || 'first'} edition was published by ${book.publisher}`
+    }
+
+    if (book.place_of_publication) {
+      description += ` in ${book.place_of_publication}`
+    }
+
+    if (book.year) {
+      description += `, ${book.year}`
+    }
+
+    return description
+  }
 
   const renderStars = (rating) =>
     [...Array(5)].map((_, index) => (
@@ -90,7 +85,51 @@ function Homepage() {
     navigate(`/book/${bookId}`)
   }
 
-  if (loading) return <div className="loading">Loading...</div>
+  const handleImageLoad = (id) => {
+    setLoadingImages((prev) => ({
+      ...prev,
+      [id]: false
+    }))
+  }
+
+  const handleImageError = (id) => {
+    setLoadingImages((prev) => ({
+      ...prev,
+      [id]: false
+    }))
+  }
+
+  const renderSkeletonLoading = () => (
+    <div className="homepage-container">
+      <div className="main-content">
+        <div className="book-details">
+          <Skeleton type="title" />
+          <Skeleton type="text" />
+          <Skeleton type="text" />
+          <Skeleton type="text" />
+          <div className="button-container">
+            <div className="skeleton button"></div>
+          </div>
+        </div>
+        <div className="book-cover">
+          <Skeleton type="cover" />
+        </div>
+      </div>
+
+      <div className="popular-books">
+        <h2>Popular Books</h2>
+        <div className="books-grid">
+          {[...Array(10)].map((_, index) => (
+            <div key={index} className="book-card">
+              <Skeleton type="card" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+
+  if (loading) return renderSkeletonLoading()
 
   return (
     <div className="homepage-container">
@@ -104,7 +143,7 @@ function Homepage() {
               <span>{featuredBook.rating}/5</span>
             </div>
 
-            <p className="book-description">{bookDescription || 'Description not available.'}</p>
+            <div className="book-description">{generateDescription(featuredBook)}</div>
 
             <div className="button-container">
               <button
@@ -112,19 +151,23 @@ function Homepage() {
                 onClick={handleBorrowRequest}
                 disabled={featuredBook.status !== 'Available'}
               >
-                {featuredBook.status === 'Available'
-                  ? 'Borrow Book Request'
-                  : 'Currently Unavailable'}
+                {featuredBook.status === 'Available' ? 'See More' : 'Currently Unavailable'}
               </button>
             </div>
           </div>
 
-          <div className="book-cover">
+          <div
+            className={`book-cover ${loadingImages[featuredBook?.id] !== false ? 'loading' : ''}`}
+          >
             <img
               src={featuredBook.coverImage}
               alt={featuredBook.title}
               loading="lazy"
-              onError={(e) => (e.target.src = defaultCover)}
+              onLoad={() => handleImageLoad(featuredBook.id)}
+              onError={(e) => {
+                e.target.src = defaultCover
+                handleImageError(featuredBook.id)
+              }}
             />
           </div>
         </div>
@@ -134,16 +177,28 @@ function Homepage() {
         <h2>Popular Books</h2>
         <div className="books-grid">
           {popularBooks.map((book) => (
-            <div key={book.id} className="book-card" onClick={() => handleBookClick(book.id)}>
+            <div
+              key={book.id}
+              className={`book-card ${loadingImages[book.id] !== false ? 'loading' : ''}`}
+              onClick={() => handleBookClick(book.id)}
+            >
               <img
                 src={book.cover}
                 alt={book.title}
                 loading="lazy"
-                onError={(e) => (e.target.src = defaultCover)}
+                onLoad={() => handleImageLoad(book.id)}
+                onError={(e) => {
+                  e.target.src = defaultCover
+                  handleImageError(book.id)
+                }}
               />
-              <p className="book-title">{book.title}</p>
-              <p className="book-author">{book.author}</p>
-              <div className={`book-status ${book.status.toLowerCase()}`}>{book.status}</div>
+              <div className="book-info">
+                <p className="book-title">{book.title}</p>
+                <p className="book-author">{book.author}</p>
+                <div className={`book-status ${book.status?.toLowerCase() || 'unknown'}`}>
+                  {book.status || 'Unknown'}
+                </div>
+              </div>
             </div>
           ))}
         </div>

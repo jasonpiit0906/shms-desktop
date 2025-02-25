@@ -1,33 +1,79 @@
 .search-page {
-  min-height: calc(100vh - 2rem);
-  background: #0a0b64;
-  padding: 4rem 2rem;
+  min-height: 100vh;
+  background: #f0f4f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.search-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M15 20h30v4H15v-4zm0 8h30v4H15v-4zm0 8h30v4H15v-4z' fill='%232b6cb0' fill-opacity='0.1'/%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+  z-index: 1;
 }
 
 .search-container {
+  width: 100%;
   max-width: 800px;
-  margin: 0 auto;
+  text-align: center;
+  margin-top: -10vh;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.1),
+    0 1px 8px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(5px);
+  position: relative;
+  z-index: 2;
+}
+
+.search-title {
+  font-size: 2.5rem;
+  color: #1a365d;
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+.search-subtitle {
+  color: #4a5568;
+  margin-bottom: 3rem;
+  font-size: 1.1rem;
 }
 
 .search-wrapper {
   position: relative;
-  margin-bottom: 2rem;
+  width: 80%;
+  margin: 0 auto 2rem auto;
+  display: flex;
+  align-items: center;
 }
 
 .search-input {
   width: 100%;
-  padding: 1.5rem 2rem;
+  padding: 1.5rem 3.5rem 1.5rem 2rem;
   font-size: 1.1rem;
-  border: none;
-  border-radius: 15px;
+  border: 2px solid transparent;
+  border-radius: 20px;
   background: white;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .search-input:focus {
   outline: none;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: #2b6cb0;
+  box-shadow: 0 8px 35px rgba(43, 108, 176, 0.15);
 }
 
 .search-icon {
@@ -35,37 +81,136 @@
   right: 1.5rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #4caf50;
+  color: #2b6cb0;
   font-size: 1.2rem;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.search-icon.hidden {
+  opacity: 0;
 }
 
 .search-dropdown {
-  margin-top: 1rem;
-  background: white;
+  position: relative;
+  margin-top: 0.5rem;
+  background: #ffffff;
   border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .dropdown-item {
-  padding: 1.5rem;
+  padding: 1rem;
+  background: #ffffff;
   border-bottom: 1px solid #f0f0f0;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .dropdown-item:hover {
-  background: rgba(76, 175, 80, 0.05);
-  transform: translateX(10px);
+  background: #ebf8ff;
+  transform: translateX(5px);
 }
 
 .dropdown-item.selected {
-  background: rgba(76, 175, 80, 0.1);
-  border-left: 4px solid #4caf50;
+  background: #ebf8ff;
+  border-left: 3px solid #2b6cb0;
+}
+
+.dropdown-item-cover {
+  width: 50px;
+  height: 70px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  object-fit: cover;
+  background: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .loading-indicator {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  font-size: 1.1rem;
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #e53e3e;
+  font-size: 0.9rem;
+  animation: pulse 1.5s infinite;
+  z-index: 2;
+}
+
+@keyframes pulse {
+  0% {
+    color: #e53e3e;
+    opacity: 1;
+  }
+  50% {
+    color: #fc8181;
+    opacity: 0.5;
+  }
+  100% {
+    color: #e53e3e;
+    opacity: 1;
+  }
+}
+
+.book-title {
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-details {
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+.book-details span {
+  margin-right: 1rem;
+  color: #e53e3e;
+}
+
+.floating-books {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floating-book {
+  position: absolute;
+  width: 40px;
+  height: 50px;
+  background: #2b6cb0;
+  opacity: 0.1;
+  border-radius: 3px;
+  animation: float 15s infinite linear;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+  }
 }
