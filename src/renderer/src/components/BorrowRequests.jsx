@@ -58,7 +58,7 @@ function BorrowRequests() {
 
   return (
     <div className="borrow-requests-container">
-      <h1>All Books Collection ({allBooks.length} Books)</h1>
+      <h1>All Books Collection</h1>
       <div className="requests-grid">
         {allBooks.map((book, index) => (
           <div

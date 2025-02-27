@@ -113,7 +113,7 @@ function BookDetails() {
   return (
     <div className="book-details-container">
       <div className="details-floating-books">{renderFloatingBooks()}</div>
-      <button className="back-button" onClick={() => navigate('/')}>
+      <button className="back-button" onClick={() => navigate('/search')}>
         <FaArrowLeft /> Back to Search
       </button>
 
