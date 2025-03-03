@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { FaStar } from 'react-icons/fa'
 import axios from 'axios'
-import { useNavigate, Link, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import '../styles/Homepage.css'
 import '../styles/Navbar.css'
 import defaultCover from '../assets/default-book-cover.svg'
-import logo from '../assets/logo.png' // Make sure to add your logo
 import Skeleton from './Skeleton'
 
 function Homepage() {
