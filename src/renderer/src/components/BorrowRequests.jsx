@@ -4,6 +4,7 @@ import axios from 'axios'
 import Skeleton from './Skeleton'
 import '../styles/BorrowRequests.css'
 import defaultCover from '../assets/default-book-cover.svg'
+import { FaBook } from 'react-icons/fa' // Add this import at the top with other imports
 
 function BorrowRequests() {
   const [allBooks, setAllBooks] = useState([])
@@ -12,6 +13,48 @@ function BorrowRequests() {
 
   const getCoverUrl = (isbn) =>
     isbn ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg` : defaultCover
+
+  const isImageBlank = (imgElement) => {
+    try {
+      const canvas = document.createElement('canvas')
+      canvas.width = imgElement.width
+      canvas.height = imgElement.height
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(imgElement, 0, 0)
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      const data = imageData.data
+
+      let whitePixels = 0
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i]
+        const g = data[i + 1]
+        const b = data[i + 2]
+        if (r > 240 && g > 240 && b > 240) {
+          whitePixels++
+        }
+      }
+
+      return whitePixels / (data.length / 4) > 0.95
+    } catch (e) {
+      return false
+    }
+  }
+
+  const handleImageLoad = (e) => {
+    if (isImageBlank(e.target)) {
+      showNoCover(e.target)
+    }
+  }
+
+  const showNoCover = (imgElement) => {
+    if (imgElement) {
+      imgElement.style.display = 'none'
+      if (imgElement.nextElementSibling) {
+        imgElement.nextElementSibling.style.display = 'flex'
+      }
+    }
+  }
 
   useEffect(() => {
     const fetchAllBooks = async () => {
@@ -71,8 +114,14 @@ function BorrowRequests() {
               src={getCoverUrl(book.isbn)}
               alt={book.title}
               loading="lazy"
-              onError={(e) => (e.target.src = defaultCover)}
+              crossOrigin="anonymous"
+              onLoad={handleImageLoad}
+              onError={(e) => showNoCover(e.target)}
             />
+            <div className="no-cover" style={{ display: 'none' }}>
+              <FaBook />
+              <p>No Cover Available</p>
+            </div>
             <div className="book-info">
               <h3>{book.title}</h3>
               <p className="author">By {book.author}</p>

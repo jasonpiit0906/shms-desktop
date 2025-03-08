@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { FaStar } from 'react-icons/fa'
+import { FaStar, FaBook } from 'react-icons/fa'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import '../styles/Homepage.css'
@@ -84,18 +84,56 @@ function Homepage() {
     navigate(`/book/${bookId}`)
   }
 
-  const handleImageLoad = (id) => {
-    setLoadingImages((prev) => ({
-      ...prev,
-      [id]: false
-    }))
+  const handleImageLoad = (id, imgElement) => {
+    const isWhiteCover = isImageBlank(imgElement)
+    if (isWhiteCover) {
+      handleImageError(id, imgElement)
+    } else {
+      setLoadingImages((prev) => ({
+        ...prev,
+        [id]: false
+      }))
+    }
   }
 
-  const handleImageError = (id) => {
+  // Add this new function to detect blank/white covers
+  const isImageBlank = (imgElement) => {
+    try {
+      const canvas = document.createElement('canvas')
+      canvas.width = imgElement.width
+      canvas.height = imgElement.height
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(imgElement, 0, 0)
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      const data = imageData.data
+
+      // Check if the image is predominantly white
+      let whitePixels = 0
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i]
+        const g = data[i + 1]
+        const b = data[i + 2]
+        if (r > 240 && g > 240 && b > 240) {
+          whitePixels++
+        }
+      }
+
+      return whitePixels / (data.length / 4) > 0.95 // If 95% of pixels are white
+    } catch (e) {
+      return false
+    }
+  }
+
+  const handleImageError = (id, imgElement) => {
     setLoadingImages((prev) => ({
       ...prev,
       [id]: false
     }))
+    imgElement.style.display = 'none'
+    if (imgElement.nextElementSibling) {
+      imgElement.nextElementSibling.style.display = 'flex'
+    }
   }
 
   const renderSkeletonLoading = () => (
@@ -145,12 +183,8 @@ function Homepage() {
             <div className="book-description">{generateDescription(featuredBook)}</div>
 
             <div className="button-container">
-              <button
-                className="borrow-button"
-                onClick={handleBorrowRequest}
-                disabled={featuredBook.status !== 'Available'}
-              >
-                {featuredBook.status === 'Available' ? 'See More' : 'Currently Unavailable'}
+              <button className="borrow-button" onClick={handleBorrowRequest}>
+                See More
               </button>
             </div>
           </div>
@@ -162,12 +196,14 @@ function Homepage() {
               src={featuredBook.coverImage}
               alt={featuredBook.title}
               loading="lazy"
-              onLoad={() => handleImageLoad(featuredBook.id)}
-              onError={(e) => {
-                e.target.src = defaultCover
-                handleImageError(featuredBook.id)
-              }}
+              crossOrigin="anonymous"
+              onLoad={(e) => handleImageLoad(featuredBook.id, e.target)}
+              onError={(e) => handleImageError(featuredBook.id, e.target)}
             />
+            <div className="no-cover" style={{ display: 'none' }}>
+              <FaBook />
+              <p>No Cover Available</p>
+            </div>
           </div>
         </div>
       )}
@@ -185,12 +221,14 @@ function Homepage() {
                 src={book.cover}
                 alt={book.title}
                 loading="lazy"
-                onLoad={() => handleImageLoad(book.id)}
-                onError={(e) => {
-                  e.target.src = defaultCover
-                  handleImageError(book.id)
-                }}
+                crossOrigin="anonymous"
+                onLoad={(e) => handleImageLoad(book.id, e.target)}
+                onError={(e) => handleImageError(book.id, e.target)}
               />
+              <div className="no-cover" style={{ display: 'none' }}>
+                <FaBook />
+                <p>No Cover Available</p>
+              </div>
               <div className="book-info">
                 <p className="book-title">{book.title}</p>
                 <p className="book-author">{book.author}</p>
