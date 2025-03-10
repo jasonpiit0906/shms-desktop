@@ -208,20 +208,37 @@
   display: flex;
   gap: 1.5rem;
   overflow-x: auto;
-  padding: 2rem 0;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  margin: 0 -2rem;
   padding: 2rem;
-}
+  position: relative;
 
-.books-grid::-webkit-scrollbar {
-  display: none;
+  /* Simple smooth scrolling */
+  scroll-behavior: smooth;
+
+  /* Show scrollbar */
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  /* Remove touch/drag related styles */
+  cursor: auto;
 }
 
 .book-card {
-  flex: 0 0 300px;
+  flex: 0 0 300px; /* Keep this to maintain card width */
   text-align: center;
   padding: 0;
   border-radius: 4px;
@@ -233,6 +250,8 @@
   cursor: pointer;
   overflow: hidden;
   position: relative;
+  user-select: auto;
+  -webkit-user-select: auto;
 }
 
 .book-card:hover {
@@ -419,13 +438,40 @@
   animation: shimmer 1.5s infinite;
 }
 
+.popular-books::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 50px;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1));
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.popular-books::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 50px;
+  height: 100%;
+  background: linear-gradient(to left, transparent, rgba(255, 255, 255, 0.1));
+  pointer-events: none;
+  opacity: 0.8;
+  z-index: 1;
+}
+
 @media (max-width: 768px) {
   .main-content {
     grid-template-columns: 1fr;
   }
 
   .books-grid {
-    gap: 1.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    gap: 1rem;
   }
 
   .book-cover img {
