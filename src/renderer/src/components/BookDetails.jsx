@@ -12,9 +12,10 @@ function BookDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
 
-  const getCoverUrl = (isbn) => {
-    return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`
-  }
+  // Remove or comment out the getCoverUrl function since we won't use it
+  // const getCoverUrl = (isbn) => {
+  //   return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`
+  // }
 
   const generateDescription = (book) => {
     if (!book) return ''
@@ -122,7 +123,7 @@ function BookDetails() {
           <div className="book-cover-section">
             <div className="book-cover">
               <img
-                src={!imageError && book?.isbn ? getCoverUrl(book.isbn) : defaultCover}
+                src={!imageError && book?.book_cover ? book.book_cover : defaultCover}
                 alt={book?.title || 'Default Cover'}
                 onError={() => setImageError(true)}
               />

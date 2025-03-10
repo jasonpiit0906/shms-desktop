@@ -174,10 +174,6 @@ function SearchPage() {
     }
   }, [])
 
-  const getCoverUrl = (isbn) => {
-    return `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`
-  }
-
   const renderFloatingBooks = () => {
     const books = []
     for (let i = 0; i < 20; i++) {
@@ -225,14 +221,22 @@ function SearchPage() {
                 className={`dropdown-item ${index === selectedIndex ? 'selected' : ''}`}
                 onClick={() => handleItemClick(item)}
               >
-                <img
-                  src={item.isbn ? getCoverUrl(item.isbn) : defaultCover}
-                  alt={item.title}
-                  className="dropdown-item-cover"
-                  onError={(e) => {
-                    e.target.src = defaultCover
-                  }}
-                />
+                {item.book_cover ? (
+                  <img
+                    src={item.book_cover}
+                    alt={item.title}
+                    className="dropdown-item-cover"
+                    onError={(e) => {
+                      e.target.src = defaultCover
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={defaultCover}
+                    alt="No cover available"
+                    className="dropdown-item-cover"
+                  />
+                )}
                 <div className="dropdown-item-info">
                   <div className="book-title">{item.title}</div>
                   <div className="book-details">

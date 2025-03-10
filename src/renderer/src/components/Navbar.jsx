@@ -9,22 +9,24 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="navbar-left">
-        <Link to="/" className="logo-link">
-          <img src={logo} alt="Logo" className="navbar-logo" />
-          <h2>E Library</h2>
-        </Link>
-      </div>
-      <div className="navbar-right">
-        <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
-          <FaHome /> Home
-        </Link>
-        <Link
-          to="/search"
-          className={`nav-link ${location.pathname === '/search' ? 'active' : ''}`}
-        >
-          <FaSearch /> Search
-        </Link>
+      <div className="navbar-content">
+        <div className="navbar-left">
+          <Link to="/" className="logo-link">
+            <img src={logo} alt="Logo" className="navbar-logo" />
+            <h2>E Library</h2>
+          </Link>
+        </div>
+        <div className="navbar-right">
+          <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
+            <FaHome /> Home
+          </Link>
+          <Link
+            to="/search"
+            className={`nav-link ${location.pathname === '/search' ? 'active' : ''}`}
+          >
+            <FaSearch /> Search
+          </Link>
+        </div>
       </div>
     </nav>
   )

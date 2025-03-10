@@ -23,11 +23,11 @@
 
 .search-container {
   width: 100%;
-  max-width: 800px;
+  max-width: min(50%, 1500px);
   text-align: center;
   margin-top: -10vh;
   background: rgba(255, 255, 255, 0.95);
-  padding: 3rem;
+  padding: clamp(2rem, 4vw, 3rem);
   border-radius: 20px;
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.1),
@@ -38,7 +38,7 @@
 }
 
 .search-title {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 3vw, 2.5rem);
   color: #1a365d;
   margin-bottom: 2rem;
   font-weight: 700;
@@ -47,12 +47,12 @@
 .search-subtitle {
   color: #4a5568;
   margin-bottom: 3rem;
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 1.2vw, 1.1rem);
 }
 
 .search-wrapper {
   position: relative;
-  width: 80%;
+  width: min(95%, 800px);
   margin: 0 auto 2rem auto;
   display: flex;
   align-items: center;
@@ -60,8 +60,8 @@
 
 .search-input {
   width: 100%;
-  padding: 1.5rem 3.5rem 1.5rem 2rem;
-  font-size: 1.1rem;
+  padding: clamp(1.2rem, 2vw, 1.5rem) clamp(2rem, 3vw, 3.5rem);
+  font-size: clamp(1rem, 1.2vw, 1.1rem);
   border: 2px solid transparent;
   border-radius: 20px;
   background: white;

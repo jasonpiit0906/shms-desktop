@@ -14,24 +14,26 @@ function Homepage() {
   const [loadingImages, setLoadingImages] = useState({})
   const navigate = useNavigate()
 
-  const getCoverUrl = (isbn) =>
-    isbn ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg` : defaultCover
+  // Remove or comment out the getCoverUrl function
+  // const getCoverUrl = (isbn) => {
+  //   return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`
+  // }
 
   useEffect(() => {
     const fetchRecentBooks = async () => {
       setLoading(true)
       try {
         const response = await axios.get('http://countmein.pythonanywhere.com/api/v1/marc/search/')
-        const books = response.data.results.slice(0, 6).map((book) => ({
+        const books = response.data.results.map((book) => ({
           ...book,
-          cover: getCoverUrl(book.isbn)
+          cover: book.book_cover || defaultCover
         }))
 
         // Set the first book as featured
         if (books.length > 0) {
           setFeaturedBook({
             ...books[0],
-            coverImage: getCoverUrl(books[0].isbn),
+            coverImage: books[0].book_cover || defaultCover,
             rating: 4 // You can adjust this or make it dynamic
           })
         }

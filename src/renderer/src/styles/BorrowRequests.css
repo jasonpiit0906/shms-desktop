@@ -1,6 +1,7 @@
 .borrow-requests-container {
-  padding: 20px;
-  max-width: 1400px;
+  padding: clamp(1rem, 3vw, 3rem);
+  max-width: 1500px;
+  width: 95%;
   margin: 0 auto;
   min-height: 100vh;
 }
@@ -25,8 +26,8 @@
 
 .requests-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(160px, 20vw, 200px), 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
   padding: 20px 0;
   margin-bottom: 2rem;
   perspective: 1000px;
@@ -34,8 +35,8 @@
 
 .book-request-card {
   position: relative;
-  width: 200px;
-  height: 320px;
+  width: 100%;
+  height: clamp(240px, 35vw, 320px);
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
@@ -213,7 +214,7 @@
 /* Responsive adjustments */
 @media (max-width: 1200px) {
   .requests-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
 
   .skeleton-grid {

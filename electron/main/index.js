@@ -4,8 +4,13 @@ let win
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 800,
+    minWidth: 1024,
+    minHeight: 768,
+    maximizable: true,
+    fullscreenable: false,
+    center: true,
     webPreferences: {
       nodeIntegration: true,
       webSecurity: true,
@@ -18,6 +23,9 @@ function createWindow() {
       }
     }
   })
+
+  // Prevent window from being maximized
+  win.setMaximizable(false)
 
   win.loadFile('index.html')
 }
