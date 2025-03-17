@@ -4,7 +4,7 @@
   directories: {
     output: 'release/${version}'
   },
-  files: ['dist-electron', 'dist'],
+  files: ['dist/**/*', 'out/**/*'],
   win: {
     target: [
       {
@@ -22,9 +22,8 @@
   },
   extraResources: [
     {
-      from: 'dist/renderer',
-      to: 'renderer',
-      filter: ['**/*']
+      from: 'src/renderer/src/styles',
+      to: 'styles'
     }
   ],
   electronDownload: {

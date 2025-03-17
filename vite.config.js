@@ -19,6 +19,13 @@ export default defineConfig({
         main: resolve(__dirname, 'src/renderer/index.html')
       }
     },
-    emptyOutDir: true
+    emptyOutDir: true,
+    sourcemap: true,
+    cssCodeSplit: false
+  },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src/renderer/src')
+    }
   }
 })
