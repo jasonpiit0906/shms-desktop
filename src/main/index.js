@@ -36,22 +36,27 @@ function createWindow() {
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          "default-src 'self' http://countmein.pythonanywhere.com;",
-          "img-src 'self' http://countmein.pythonanywhere.com data: https:;",
-          "script-src 'self' 'unsafe-inline';",
+          "default-src 'self' http://countmein.pythonanywhere.com https://countmein.pythonanywhere.com;",
+          "img-src 'self' http://countmein.pythonanywhere.com https://countmein.pythonanywhere.com data: https:;",
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
           "style-src 'self' 'unsafe-inline';",
-          "connect-src 'self' http://countmein.pythonanywhere.com;"
+          "connect-src 'self' http://countmein.pythonanywhere.com https://countmein.pythonanywhere.com;"
         ].join(' ')
       }
     })
   })
 
-  // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    // Enable loading of local resources in production
+    mainWindow.webContents.on('did-finish-load', () => {
+      mainWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+        callback({})
+      })
+    })
   }
 }
 
