@@ -4,7 +4,6 @@ import Layout from './components/Layout'
 import Homepage from './components/Homepage'
 import SearchPage from './components/SearchPage'
 import BookDetails from './components/BookDetails'
-import BorrowRequests from './components/BorrowRequests'
 
 function App() {
   return (
@@ -14,7 +13,6 @@ function App() {
           <Route path="/" element={<Homepage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/book/:id" element={<BookDetails />} />
-          <Route path="/borrow-requests" element={<BorrowRequests />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>

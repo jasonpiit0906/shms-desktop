@@ -6,17 +6,17 @@ import icon from '../../resources/icon.png?asset'
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1200, // Increased width
+    height: 800, // Increased height
     show: false,
-    fullscreen: true,
+    fullscreen: false, // Changed from true to false
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      webSecurity: false, // Only for development! Configure proper CSP for production
-      allowRunningInsecureContent: true // Only for development! Remove in production
+      webSecurity: true, // Enable web security
+      allowRunningInsecureContent: false // Disable insecure content
     }
   })
 
@@ -27,6 +27,22 @@ function createWindow() {
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
+  })
+
+  // Add CSP headers
+  mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self' http://countmein.pythonanywhere.com;",
+          "img-src 'self' http://countmein.pythonanywhere.com data: https:;",
+          "script-src 'self' 'unsafe-inline';",
+          "style-src 'self' 'unsafe-inline';",
+          "connect-src 'self' http://countmein.pythonanywhere.com;"
+        ].join(' ')
+      }
+    })
   })
 
   // HMR for renderer base on electron-vite cli.

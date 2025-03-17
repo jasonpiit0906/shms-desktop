@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { FaStar, FaBook } from 'react-icons/fa'
+import { FaStar, FaBookReader } from 'react-icons/fa'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import '../styles/Homepage.css'
@@ -13,11 +13,6 @@ function Homepage() {
   const [loading, setLoading] = useState(true)
   const [loadingImages, setLoadingImages] = useState({})
   const navigate = useNavigate()
-
-  // Remove or comment out the getCoverUrl function
-  // const getCoverUrl = (isbn) => {
-  //   return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`
-  // }
 
   useEffect(() => {
     const fetchRecentBooks = async () => {
@@ -78,9 +73,9 @@ function Homepage() {
       <FaStar key={index} className={index < rating ? 'star-filled' : 'star-empty'} />
     ))
 
-  const handleBorrowRequest = () => {
-    navigate('/borrow-requests')
-  }
+  // const handleBorrowRequest = () => {
+  //   navigate('/borrow-requests')
+  // }
 
   const handleBookClick = (bookId) => {
     navigate(`/book/${bookId}`)
@@ -142,27 +137,100 @@ function Homepage() {
     <div className="homepage-container">
       <div className="main-content">
         <div className="book-details">
-          <Skeleton type="title" />
-          <Skeleton type="text" />
-          <Skeleton type="text" />
-          <Skeleton type="text" />
+          <Skeleton style={{ height: '3rem', width: '70%', marginBottom: '1rem' }} />
+          <Skeleton style={{ height: '1.5rem', width: '40%', marginBottom: '2rem' }} />
+          <div className="rating">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton
+                key={i}
+                style={{ height: '20px', width: '20px', borderRadius: '50%', margin: '0 2px' }}
+              />
+            ))}
+          </div>
+          <Skeleton style={{ height: '8rem', width: '100%', marginBottom: '2rem' }} />
+          <div className="availability-info">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} style={{ height: '2.5rem', width: '100%' }} />
+            ))}
+          </div>
           <div className="button-container">
-            <div className="skeleton button"></div>
+            <Skeleton style={{ height: '3.5rem', width: '50%' }} />
           </div>
         </div>
         <div className="book-cover">
-          <Skeleton type="cover" />
+          <Skeleton
+            style={{
+              width: '100%',
+              height: '100%',
+              aspectRatio: '3/4',
+              borderRadius: '12px'
+            }}
+          />
         </div>
       </div>
 
       <div className="popular-books">
-        <h2>Popular Books</h2>
+        <Skeleton style={{ height: '2.5rem', width: '250px', margin: '0 auto 2rem' }} />
         <div className="books-grid">
           {[...Array(10)].map((_, index) => (
             <div key={index} className="book-card">
-              <Skeleton type="card" />
+              <Skeleton
+                style={{
+                  width: '100%',
+                  aspectRatio: '2/3',
+                  borderRadius: '12px',
+                  marginBottom: '1rem'
+                }}
+              />
+              <Skeleton style={{ height: '1.2rem', width: '80%', margin: '0.5rem auto' }} />
+              <Skeleton style={{ height: '1rem', width: '60%', margin: '0.5rem auto' }} />
+              <Skeleton style={{ height: '1.5rem', width: '40%', margin: '0.5rem auto' }} />
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderBookCard = (book) => (
+    <div key={book.id} className="book-card">
+      <div className="book-image-container" onClick={() => handleBookClick(book.id)}>
+        <Skeleton
+          className="book-image-skeleton"
+          style={{
+            width: '100%',
+            aspectRatio: '2/3',
+            borderRadius: '12px',
+            position: 'absolute',
+            top: 0,
+            left: 0
+          }}
+        />
+        {book.cover ? (
+          <img
+            src={book.cover}
+            alt={book.title}
+            loading="lazy"
+            crossOrigin="anonymous"
+            onLoad={(e) => {
+              e.target.style.opacity = '1'
+              e.target.previousSibling.style.display = 'none'
+            }}
+            onError={(e) => handleImageError(book.id, e.target)}
+            style={{ opacity: 0, transition: 'opacity 0.3s ease' }}
+          />
+        ) : (
+          <div className="no-cover">
+            <FaBookReader />
+            <p>Book Cover Not Available</p>
+          </div>
+        )}
+      </div>
+      <div className="book-info">
+        <p className="book-title">{book.title}</p>
+        <p className="book-author">{book.author}</p>
+        <div className={`book-status ${book.status?.toLowerCase() || 'unknown'}`}>
+          {book.status || 'Unknown'}
         </div>
       </div>
     </div>
@@ -185,8 +253,11 @@ function Homepage() {
             <div className="book-description">{generateDescription(featuredBook)}</div>
 
             <div className="button-container">
-              <button className="borrow-button" onClick={handleBorrowRequest}>
-                See More
+              <button
+                className="borrow-button"
+                onClick={handleBookClick.bind(null, featuredBook.id)}
+              >
+                View Details
               </button>
             </div>
           </div>
@@ -194,53 +265,28 @@ function Homepage() {
           <div
             className={`book-cover ${loadingImages[featuredBook?.id] !== false ? 'loading' : ''}`}
           >
-            <img
-              src={featuredBook.coverImage}
-              alt={featuredBook.title}
-              loading="lazy"
-              crossOrigin="anonymous"
-              onLoad={(e) => handleImageLoad(featuredBook.id, e.target)}
-              onError={(e) => handleImageError(featuredBook.id, e.target)}
-            />
-            <div className="no-cover" style={{ display: 'none' }}>
-              <FaBook />
-              <p>No Cover Available</p>
-            </div>
+            {featuredBook.coverImage ? (
+              <img
+                src={featuredBook.coverImage}
+                alt={featuredBook.title}
+                loading="lazy"
+                crossOrigin="anonymous"
+                onLoad={(e) => handleImageLoad(featuredBook.id, e.target)}
+                onError={(e) => handleImageError(featuredBook.id, e.target)}
+              />
+            ) : (
+              <div className="no-cover">
+                <FaBookReader />
+                <p>Book Cover Not Available</p>
+              </div>
+            )}
           </div>
         </div>
       )}
 
       <div className="popular-books">
         <h2>Popular Books</h2>
-        <div className="books-grid">
-          {popularBooks.map((book) => (
-            <div
-              key={book.id}
-              className={`book-card ${loadingImages[book.id] !== false ? 'loading' : ''}`}
-              onClick={() => handleBookClick(book.id)}
-            >
-              <img
-                src={book.cover}
-                alt={book.title}
-                loading="lazy"
-                crossOrigin="anonymous"
-                onLoad={(e) => handleImageLoad(book.id, e.target)}
-                onError={(e) => handleImageError(book.id, e.target)}
-              />
-              <div className="no-cover" style={{ display: 'none' }}>
-                <FaBook />
-                <p>No Cover Available</p>
-              </div>
-              <div className="book-info">
-                <p className="book-title">{book.title}</p>
-                <p className="book-author">{book.author}</p>
-                <div className={`book-status ${book.status?.toLowerCase() || 'unknown'}`}>
-                  {book.status || 'Unknown'}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <div className="books-grid">{popularBooks.map((book) => renderBookCard(book))}</div>
       </div>
     </div>
   )
