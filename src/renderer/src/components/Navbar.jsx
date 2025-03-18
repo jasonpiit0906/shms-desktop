@@ -13,7 +13,7 @@ function Navbar() {
         <div className="navbar-left">
           <Link to="/" className="logo-link">
             <img src={logo} alt="Logo" className="navbar-logo" />
-            <h2>E Library</h2>
+            <h2>eLibrary</h2>
           </Link>
         </div>
         <div className="navbar-right">

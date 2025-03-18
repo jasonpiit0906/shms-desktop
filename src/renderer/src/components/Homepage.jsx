@@ -21,14 +21,18 @@ function Homepage() {
         const response = await axios.get('http://countmein.pythonanywhere.com/api/v1/marc/search/')
         const books = response.data.results.map((book) => ({
           ...book,
-          cover: book.book_cover || defaultCover
+          cover:
+            book.book_cover && book.book_cover.startsWith('http') ? book.book_cover : defaultCover
         }))
 
         // Set the first book as featured
         if (books.length > 0) {
           setFeaturedBook({
             ...books[0],
-            coverImage: books[0].book_cover || defaultCover,
+            coverImage:
+              books[0].book_cover && books[0].book_cover.startsWith('http')
+                ? books[0].book_cover
+                : defaultCover,
             rating: 4 // You can adjust this or make it dynamic
           })
         }
@@ -127,9 +131,17 @@ function Homepage() {
       ...prev,
       [id]: false
     }))
-    imgElement.style.display = 'none'
-    if (imgElement.nextElementSibling) {
-      imgElement.nextElementSibling.style.display = 'flex'
+    if (imgElement.src !== defaultCover) {
+      imgElement.src = defaultCover
+      imgElement.style.opacity = '1'
+      if (imgElement.previousSibling) {
+        imgElement.previousSibling.style.display = 'none'
+      }
+    } else {
+      imgElement.style.display = 'none'
+      if (imgElement.nextElementSibling) {
+        imgElement.nextElementSibling.style.display = 'flex'
+      }
     }
   }
 

@@ -3,7 +3,7 @@
   background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
   border-radius: 5px;
   background-size: 200% 100%;
-  animation: 1.5s shine linear infinite;
+  animation: skeleton-loading 1s linear infinite alternate;
 }
 
 .skeleton.title {
@@ -31,5 +31,14 @@
 @keyframes shine {
   to {
     background-position-x: -200%;
+  }
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: #f0f0f0;
+  }
+  100% {
+    background-color: #e0e0e0;
   }
 }

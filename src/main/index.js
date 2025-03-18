@@ -37,10 +37,10 @@ function createWindow() {
         ...details.responseHeaders,
         'Content-Security-Policy': [
           "default-src 'self' http://countmein.pythonanywhere.com https://countmein.pythonanywhere.com;",
-          "img-src 'self' http://countmein.pythonanywhere.com https://countmein.pythonanywhere.com data: https:;",
+          "img-src 'self' http://countmein.pythonanywhere.com https://countmein.pythonanywhere.com https://covers.openlibrary.org data: blob: https:;",
           "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
           "style-src 'self' 'unsafe-inline';",
-          "connect-src 'self' http://countmein.pythonanywhere.com https://countmein.pythonanywhere.com;"
+          "connect-src 'self' http://countmein.pythonanywhere.com https://countmein.pythonanywhere.com https://openlibrary.org;"
         ].join(' ')
       }
     })
