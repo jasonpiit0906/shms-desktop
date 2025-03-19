@@ -149,6 +149,7 @@ function Homepage() {
     <div className="homepage-container">
       <div className="main-content">
         <div className="book-details">
+          {/* Removed new-tag from here */}
           <Skeleton style={{ height: '3rem', width: '70%', marginBottom: '1rem' }} />
           <Skeleton style={{ height: '1.5rem', width: '40%', marginBottom: '2rem' }} />
           <div className="rating">
@@ -170,6 +171,7 @@ function Homepage() {
           </div>
         </div>
         <div className="book-cover">
+          <div className="new-tag">New Arrival</div>
           <Skeleton
             style={{
               width: '100%',
@@ -207,6 +209,8 @@ function Homepage() {
   const renderBookCard = (book) => (
     <div key={book.id} className="book-card">
       <div className="book-image-container" onClick={() => handleBookClick(book.id)}>
+        {/* Show New Arrival tag for first 10 books in any section */}
+        {book.id <= 10 && <div className="new-tag">New Arrival</div>}
         <Skeleton
           className="book-image-skeleton"
           style={{
@@ -255,6 +259,7 @@ function Homepage() {
       {featuredBook && (
         <div className="main-content">
           <div className="book-details">
+            {/* Removed new-tag from here */}
             <h1>{featuredBook.title}</h1>
             <div className="author-info">By {featuredBook.author}</div>
             <div className="rating">
@@ -277,9 +282,10 @@ function Homepage() {
           <div
             className={`book-cover ${loadingImages[featuredBook?.id] !== false ? 'loading' : ''}`}
           >
-            {featuredBook.coverImage ? (
+            <div className="new-tag">New Arrival</div>
+            {featuredBook.book_cover ? (
               <img
-                src={featuredBook.coverImage}
+                src={featuredBook.book_cover}
                 alt={featuredBook.title}
                 loading="lazy"
                 crossOrigin="anonymous"
@@ -298,7 +304,18 @@ function Homepage() {
 
       <div className="popular-books">
         <h2>Popular Books</h2>
-        <div className="books-grid">{popularBooks.map((book) => renderBookCard(book))}</div>
+        <div className="books-grid">
+          {popularBooks.map((book, index) => renderBookCard({ ...book, id: index + 1 }))}
+        </div>
+      </div>
+
+      <div className="popular-books grade-school-books">
+        <h2>Grade School Books</h2>
+        <div className="books-grid">
+          {popularBooks
+            .slice(0, 10)
+            .map((book, index) => renderBookCard({ ...book, id: index + 1 }))}
+        </div>
       </div>
     </div>
   )
