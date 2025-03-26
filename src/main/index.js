@@ -36,11 +36,11 @@ function createWindow() {
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          "default-src 'self' http://countmein.pythonanywhere.com https://countmein.pythonanywhere.com;",
-          "img-src 'self' http://countmein.pythonanywhere.com https://countmein.pythonanywhere.com https://covers.openlibrary.org data: blob: https:;",
+          "default-src 'self' http://192.168.0.145:8000;",
+          "img-src 'self' http://192.168.0.145:8000 https://covers.openlibrary.org data: blob: https:;",
           "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
           "style-src 'self' 'unsafe-inline';",
-          "connect-src 'self' http://countmein.pythonanywhere.com https://countmein.pythonanywhere.com https://openlibrary.org;"
+          "connect-src 'self' http://192.168.0.145:8000 https://openlibrary.org;"
         ].join(' ')
       }
     })
@@ -66,6 +66,12 @@ function createWindow() {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  // Set up auto-start
+  app.setLoginItemSettings({
+    openAtLogin: true,
+    path: app.getPath('exe')
+  })
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
