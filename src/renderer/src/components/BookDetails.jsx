@@ -4,6 +4,7 @@ import axios from 'axios'
 import { FaArrowLeft } from 'react-icons/fa'
 import '../styles/BookDetails.css'
 import defaultCover from '../assets/default-book-cover.svg'
+import { API_ENDPOINTS } from '../api/api'
 
 function BookDetails() {
   const [book, setBook] = useState(null)
@@ -62,9 +63,7 @@ function BookDetails() {
   useEffect(() => {
     const fetchBookDetails = async () => {
       try {
-        const response = await axios.get(
-          `http://countmein.pythonanywhere.com/api/v1/marc/record/${id}/`
-        )
+        const response = await axios.get(API_ENDPOINTS.BOOK_DETAILS(id))
         setBook(response.data)
       } catch (error) {
         console.error('Error fetching book details:', error)

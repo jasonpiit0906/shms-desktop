@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import '../App.css'
 import '../styles/SearchPage.css'
 import defaultCover from '../assets/default-book-cover.svg'
+import { API_ENDPOINTS } from '../api/api'
 
 function SearchPage() {
   const [searchValue, setSearchValue] = useState('')
@@ -17,9 +18,7 @@ function SearchPage() {
 
   const fetchPage = async (searchTerm, page) => {
     try {
-      const response = await axios.get(
-        `http://countmein.pythonanywhere.com/api/v1/marc/search/?page=${page}&search=${searchTerm}`
-      )
+      const response = await axios.get(`${API_ENDPOINTS.SEARCH}?page=${page}&search=${searchTerm}`)
       console.log(`Fetched page ${page}:`, response.data)
       return response.data
     } catch (error) {
@@ -31,7 +30,7 @@ function SearchPage() {
   const fetchAllBooks = async () => {
     setLoading(true)
     try {
-      const response = await axios.get('http://countmein.pythonanywhere.com/api/v1/marc/records/')
+      const response = await axios.get(API_ENDPOINTS.ALL_BOOKS)
       console.log('Fetched all books:', response.data)
       setFilteredResults(response.data)
       setShowDropdown(true)

@@ -6,6 +6,7 @@ import '../styles/Homepage.css'
 import '../styles/Navbar.css'
 import defaultCover from '../assets/default-book-cover.svg'
 import Skeleton from './Skeleton'
+import { API_ENDPOINTS } from '../api/api'
 
 function Homepage() {
   const [featuredBook, setFeaturedBook] = useState(null)
@@ -18,7 +19,7 @@ function Homepage() {
     const fetchRecentBooks = async () => {
       setLoading(true)
       try {
-        const response = await axios.get('http://countmein.pythonanywhere.com/api/v1/marc/search/')
+        const response = await axios.get(API_ENDPOINTS.SEARCH)
         const books = response.data.results.map((book) => ({
           ...book,
           cover:
