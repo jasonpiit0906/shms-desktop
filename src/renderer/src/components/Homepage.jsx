@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { FaStar, FaBookReader } from 'react-icons/fa'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { fetchRecords } from '../api/api'
 import '../styles/Homepage.css'
 import '../styles/Navbar.css'
 import defaultCover from '../assets/default-book-cover.svg'
 import Skeleton from './Skeleton'
-import { API_ENDPOINTS } from '../api/api'
 
 function Homepage() {
   const [featuredBook, setFeaturedBook] = useState(null)
@@ -15,32 +15,53 @@ function Homepage() {
   const [loadingImages, setLoadingImages] = useState({})
   const navigate = useNavigate()
 
+  // Add this new function to shuffle array
+  const shuffleArray = (array) => {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }
+
   useEffect(() => {
     const fetchRecentBooks = async () => {
+      // if (!token) {
+      //   console.log('No token available, redirecting to login')
+      //   navigate('/login')
+      //   return
+      // }
+
       setLoading(true)
       try {
-        const response = await axios.get(API_ENDPOINTS.SEARCH)
-        const books = response.data.results.map((book) => ({
-          ...book,
-          cover:
-            book.book_cover && book.book_cover.startsWith('http') ? book.book_cover : defaultCover
-        }))
+        const response = await fetchRecords(1)
+        if (response && response.results) {
+          const books = response.results.map((book) => ({
+            ...book,
+            cover:
+              book.book_cover && book.book_cover.startsWith('http') ? book.book_cover : defaultCover
+          }))
 
-        // Set the first book as featured
-        if (books.length > 0) {
-          setFeaturedBook({
-            ...books[0],
-            coverImage:
-              books[0].book_cover && books[0].book_cover.startsWith('http')
-                ? books[0].book_cover
-                : defaultCover,
-            rating: 4 // You can adjust this or make it dynamic
-          })
+          // Set the first book as featured
+          if (books.length > 0) {
+            setFeaturedBook({
+              ...books[0],
+              coverImage:
+                books[0].book_cover && books[0].book_cover.startsWith('http')
+                  ? books[0].book_cover
+                  : defaultCover,
+              rating: 4 // You can adjust this or make it dynamic
+            })
+          }
+
+          setPopularBooks(books) // Fixed: Using setPopularBooks instead of setRecentBooks
         }
-
-        setPopularBooks(books) // Fixed: Using setPopularBooks instead of setRecentBooks
       } catch (error) {
         console.error('Error fetching recent books:', error)
+        if (error.message.includes('401')) {
+          navigate('/login')
+        }
         setPopularBooks([]) // Fixed: Using setPopularBooks instead of setRecentBooks
       } finally {
         setLoading(false)
@@ -48,7 +69,7 @@ function Homepage() {
     }
 
     fetchRecentBooks()
-  }, [])
+  }, [navigate])
 
   const generateDescription = (book) => {
     if (!book) return ''
@@ -313,7 +334,7 @@ function Homepage() {
       <div className="popular-books grade-school-books">
         <h2>Grade School Books</h2>
         <div className="books-grid">
-          {popularBooks
+          {shuffleArray(popularBooks)
             .slice(0, 10)
             .map((book, index) => renderBookCard({ ...book, id: index + 1 }))}
         </div>

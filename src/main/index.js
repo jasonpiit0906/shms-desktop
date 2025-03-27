@@ -36,11 +36,12 @@ function createWindow() {
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          "default-src 'self' http://192.168.0.145:8000;",
-          "img-src 'self' http://192.168.0.145:8000 https://covers.openlibrary.org data: blob: https:;",
+          "default-src 'self';",
           "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
           "style-src 'self' 'unsafe-inline';",
-          "connect-src 'self' http://192.168.0.145:8000 https://openlibrary.org;"
+          "img-src 'self' http://192.168.0.145:8000 https://covers.openlibrary.org data: blob: https:;",
+          "connect-src 'self' http://192.168.0.145:8000;",
+          "font-src 'self' data:;"
         ].join(' ')
       }
     })

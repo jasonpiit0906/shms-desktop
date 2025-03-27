@@ -4,7 +4,7 @@ import axios from 'axios'
 import { FaArrowLeft } from 'react-icons/fa'
 import '../styles/BookDetails.css'
 import defaultCover from '../assets/default-book-cover.svg'
-import { API_ENDPOINTS } from '../api/api'
+import { fetchBookDetails } from '../api/api'
 
 function BookDetails() {
   const [book, setBook] = useState(null)
@@ -12,39 +12,6 @@ function BookDetails() {
   const [imageError, setImageError] = useState(false)
   const { id } = useParams()
   const navigate = useNavigate()
-
-  // Remove or comment out the getCoverUrl function since we won't use it
-  // const getCoverUrl = (isbn) => {
-  //   return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`
-  // }
-
-  const generateDescription = (book) => {
-    if (!book) return ''
-
-    let description = `${book.title} is a book written by ${book.author}`
-
-    if (book.series_title) {
-      description += `, part of the ${book.series_title} series`
-    }
-
-    description += `. This ${book.edition || 'first'} edition was published by ${book.publisher}`
-
-    if (book.place_of_publication) {
-      description += ` in ${book.place_of_publication}`
-    }
-
-    if (book.year) {
-      description += `, ${book.year}`
-    }
-
-    if (book.volume) {
-      description += `, as volume ${book.volume}`
-    }
-
-    description += `. ${book.description || ''}`
-
-    return description
-  }
 
   const renderFloatingBooks = () => {
     const books = []
@@ -61,10 +28,11 @@ function BookDetails() {
   }
 
   useEffect(() => {
-    const fetchBookDetails = async () => {
+    const getBookDetails = async () => {
       try {
-        const response = await axios.get(API_ENDPOINTS.BOOK_DETAILS(id))
-        setBook(response.data)
+        setLoading(true)
+        const data = await fetchBookDetails(id)
+        setBook(data)
       } catch (error) {
         console.error('Error fetching book details:', error)
       } finally {
@@ -72,7 +40,9 @@ function BookDetails() {
       }
     }
 
-    fetchBookDetails()
+    if (id) {
+      getBookDetails()
+    }
   }, [id])
 
   if (loading) {
@@ -133,31 +103,21 @@ function BookDetails() {
                 <strong>ISBN:</strong> {book?.isbn || 'N/A'}
               </p>
               <p>
-                <strong>Accession No:</strong> {book?.accession_number || 'N/A'}
+                <strong>CopyRight:</strong> {book?.copies || 'N/A'}
               </p>
-              {book?.series_title && (
+              {book?.call_number && (
                 <p>
-                  <strong>Series:</strong> {book.series_title}
+                  <strong>Call Number:</strong> {book.call_number || 'N/A'}
+                </p>
+              )}
+              {book?.year && (
+                <p>
+                  <strong>Year:</strong> {book.year || 'N/A'}
                 </p>
               )}
               {book?.volume && (
                 <p>
-                  <strong>Volume:</strong> {book.volume}
-                </p>
-              )}
-              {book?.physical_description && (
-                <p>
-                  <strong>Description:</strong> {book.physical_description}
-                </p>
-              )}
-              {book?.subject && (
-                <p>
-                  <strong>Subject:</strong> {book.subject}
-                </p>
-              )}
-              {book?.notes && (
-                <p>
-                  <strong>Notes:</strong> {book.notes}
+                  <strong>Volume:</strong> {book.volume || 'N/A'}
                 </p>
               )}
             </div>
@@ -166,7 +126,7 @@ function BookDetails() {
           <div className="book-title-section">
             <h1 className="book-main-title">{book?.title}</h1>
             <h2 className="book-author">by {book?.author}</h2>
-            <div className="book-description">{generateDescription(book)}</div>
+            <div className="book-description">{book?.description}</div>
           </div>
         </div>
       </div>

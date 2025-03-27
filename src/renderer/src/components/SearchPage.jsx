@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { FaSearch } from 'react-icons/fa'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { fetchRecords } from '../api/api'
 import '../App.css'
 import '../styles/SearchPage.css'
 import defaultCover from '../assets/default-book-cover.svg'
-import { API_ENDPOINTS } from '../api/api'
 
 function SearchPage() {
   const [searchValue, setSearchValue] = useState('')
@@ -18,9 +17,9 @@ function SearchPage() {
 
   const fetchPage = async (searchTerm, page) => {
     try {
-      const response = await axios.get(`${API_ENDPOINTS.SEARCH}?page=${page}&search=${searchTerm}`)
-      console.log(`Fetched page ${page}:`, response.data)
-      return response.data
+      const data = await fetchRecords(page, searchTerm)
+      console.log(`Fetched page ${page}:`, data)
+      return data
     } catch (error) {
       console.error(`Error fetching page ${page}:`, error)
       return null
@@ -30,9 +29,9 @@ function SearchPage() {
   const fetchAllBooks = async () => {
     setLoading(true)
     try {
-      const response = await axios.get(API_ENDPOINTS.ALL_BOOKS)
-      console.log('Fetched all books:', response.data)
-      setFilteredResults(response.data)
+      const data = await fetchRecords(1, '')
+      console.log('Fetched all books:', data)
+      setFilteredResults(data.results || [])
       setShowDropdown(true)
     } catch (error) {
       console.error('Error fetching all books:', error)
